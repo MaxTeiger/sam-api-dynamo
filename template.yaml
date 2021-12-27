@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  sam-api-dynamo
+
+  Sample SAM Template for sam-api-dynamo
+  
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  LambdaFunctionOverHttps:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdaFunctionOverHttps/
+      Handler: app.handler
+      Runtime: nodejs12.x
+      Architectures:
+        - x86_64
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref MyTable
+      Events:
+        DynamoDBOperations:
+          Type: Api
+          Properties:
+            Path: /dynamodbmanager
+            Method: post
+  
+  MyTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: lambda-apigateway
+
+
+Outputs:
+  LambdaFunctionOverHttps:
+    Description: "Hello World Lambda Function ARN"
+    Value: !GetAtt LambdaFunctionOverHttps.Arn
+  LambdaFunctionOverHttpsIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt LambdaFunctionOverHttpsRole.Arn
